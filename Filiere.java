@@ -5,10 +5,31 @@ import java.util.List;
 public class Filiere {
     private String nomFiliere;
     private List<Etudiant> etudiants;
+    private EmploiDuTemps emploiDuTemps;
+
 
     public Filiere(String nomFiliere) {
         this.nomFiliere = nomFiliere;
         this.etudiants = new ArrayList<>();
+        this.emploiDuTemps = new EmploiDuTemps();
+
+    }
+
+    public EmploiDuTemps getEmploiDuTemps() {
+        return emploiDuTemps;
+    }
+
+    public void afficherEmploiDuTemps() {
+        System.out.println("Emploi du temps pour la filière " + nomFiliere + ":");
+        emploiDuTemps.afficherEmploi();
+    }
+
+    public boolean ajouterSeance(String jour, String creneau, Cours cours) {
+        return emploiDuTemps.ajouterSeance(jour, creneau, cours);
+    }
+
+    public void modifierSeance(String jour, String creneau, Cours cours) {
+        emploiDuTemps.modifierSeance(jour, creneau, cours);
     }
 
     public String getNomFiliere() {

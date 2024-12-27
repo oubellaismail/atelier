@@ -1,4 +1,5 @@
 import java.text.SimpleDateFormat;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -19,7 +20,11 @@ public class Main {
             System.out.println("7. Ajouter une filière");
             System.out.println("8. Afficher les filières");
             System.out.println("9. Afficher les informations d'une filiere ");
-            System.out.println("10. Quitter");
+            System.out.println("10. Ajouter une séance de cours");
+            System.out.println("11. Modifier une séance de cours");
+            System.out.println("12. Supprimer une séance de cours");
+            System.out.println("13. Afficher l'emploi du temps d'une filière");
+            System.out.println("14. Quitter");
             System.out.print("Votre choix: ");
             int choice = scanner.nextInt();
 
@@ -52,6 +57,18 @@ public class Main {
                     displayFiliereDetails(ecole, scanner);
                     break;
                 case 10: 
+                    addSeance(ecole, scanner);
+                    break;
+                case 11: 
+                    modifySeance(ecole, scanner);
+                    break;
+                case 12: 
+                    deleteSeance(ecole, scanner);
+                    break;
+                case 13: 
+                    displaySchedule(ecole, scanner);
+                    break;
+                case 14: 
                     System.out.println("Good bye!");
                     return;
                 default:
@@ -215,4 +232,108 @@ public class Main {
         System.out.println("\n--- Informations sur la filière ---");
         ecole.afficherInformationsFiliere(nomFiliere);
     }
+
+    private static void deleteSeance(Ecole ecole, Scanner scanner) {
+        System.out.print("Nom de la filière: ");
+        scanner.nextLine(); 
+        String nomFiliere = scanner.nextLine();
+
+        Filiere filiere = findFiliere(ecole, nomFiliere);
+        if (filiere == null) {
+            System.out.println("Filière introuvable !");
+            return;
+        }
+
+        System.out.print("Jour: ");
+        String jour = scanner.nextLine();
+        System.out.print("Créneau (heure): ");
+        String creneau = scanner.nextLine();
+
+        Map<String, Cours> daySchedule = filiere.getEmploiDuTemps().getEmploi().get(jour);
+        if (daySchedule == null) {
+            System.out.println("Aucune séance programmée pour ce jour !");
+            return;
+        }
+
+        if (!daySchedule.containsKey(creneau)) {
+            System.out.println("Aucune séance programmée pour ce créneau !");
+            return;
+        }
+
+        daySchedule.remove(creneau);
+        System.out.println("Séance supprimée avec succès.");
+    }
+
+
+    private static void addSeance(Ecole ecole, Scanner scanner) {
+        System.out.print("Nom de la filière: ");
+        scanner.nextLine(); // Consume newline
+        String nomFiliere = scanner.nextLine();
+        Filiere filiere = findFiliere(ecole, nomFiliere);
+    
+        if (filiere == null) {
+            System.out.println("Filière introuvable !");
+            return;
+        }
+    
+        System.out.print("Jour: ");
+        String jour = scanner.nextLine();
+        System.out.print("Créneau (heure): ");
+        String creneau = scanner.nextLine();
+        System.out.print("Nom du cours: ");
+        String nomCours = scanner.nextLine();
+        System.out.print("Salle: ");
+        String salle = scanner.nextLine();
+        System.out.print("Enseignant: ");
+        String enseignant = scanner.nextLine();
+    
+        if (!ecole.verifierConflit(jour, creneau, salle)) {
+            Cours cours = new Cours(nomCours, salle, enseignant);
+            if (filiere.ajouterSeance(jour, creneau, cours)) {
+                System.out.println("Séance ajoutée avec succès !");
+            }
+        }
+    }
+    
+    private static void displaySchedule(Ecole ecole, Scanner scanner) {
+        System.out.print("Nom de la filière: ");
+        scanner.nextLine(); // Consume newline
+        String nomFiliere = scanner.nextLine();
+        Filiere filiere = findFiliere(ecole, nomFiliere);
+    
+        if (filiere == null) {
+            System.out.println("Filière introuvable !");
+        } else {
+            filiere.afficherEmploiDuTemps();
+        }
+    }
+
+    private static void modifySeance(Ecole ecole, Scanner scanner) {
+        System.out.print("Nom de la filière: ");
+        scanner.nextLine(); 
+        String nomFiliere = scanner.nextLine();
+    
+        Filiere filiere = findFiliere(ecole, nomFiliere);
+        if (filiere == null) {
+            System.out.println("Filière introuvable !");
+            return;
+        }
+    
+        System.out.print("Jour: ");
+        String jour = scanner.nextLine();
+        System.out.print("Créneau (heure): ");
+        String creneau = scanner.nextLine();
+    
+        System.out.print("Nom du nouveau cours: ");
+        String nomCours = scanner.nextLine();
+        System.out.print("Salle: ");
+        String salle = scanner.nextLine();
+        System.out.print("Enseignant: ");
+        String enseignant = scanner.nextLine();
+    
+        Cours nouveauCours = new Cours(nomCours, salle, enseignant);
+    
+        filiere.modifierSeance(jour, creneau, nouveauCours);
+    }
+    
 }

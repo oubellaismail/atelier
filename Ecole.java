@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Ecole {
     private List<Filiere> filieres;
@@ -72,5 +73,20 @@ public class Ecole {
         }
     }
 
-    
+    public boolean verifierConflit(String jour, String creneau, String salle) {
+        for (Filiere filiere : filieres) {
+            Map<String, Cours> daySchedule = filiere.getEmploiDuTemps().getEmploi().get(jour);
+            
+            if (daySchedule == null) {
+                continue; 
+            }
+
+            Cours cours = daySchedule.get(creneau);
+            if (cours != null && cours.getSalle().equals(salle)) {
+                System.out.println("Conflit détecté : Salle " + salle + " déjà utilisée à ce créneau.");
+                return true;
+            }
+        }
+        return false;
+    }
 }
